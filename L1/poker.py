@@ -1,7 +1,5 @@
-# -----------
-# User Instructions
-#
-# Define a function, two_pair(ranks).
+import random
+
 
 def two_pair(ranks):
     """If there are two pair, return the two ranks as a
@@ -54,8 +52,13 @@ def card_ranks(cards):
     return ranks
 
 def poker(hands):
-    "Return the best hand: poker([hand,...]) => hand"
-    return max(hands, key=hand_rank)
+    "Return a list of winning hands: poker([hand,...]) => [hand,...]"
+    return allmax(hands, key=hand_rank)
+
+def allmax(iterable, key=None):
+    "Return a list of all items equal to the max of the iterable."
+    key = key or (lambda x:x) # provide a default key if the key function is not provided
+    return [x for x in iterable if (key(x) == key(max(iterable, key=key)))]
 
 def hand_rank(hand):
     ranks = card_ranks(hand)
@@ -77,6 +80,19 @@ def hand_rank(hand):
         return (1, kind(2,ranks), ranks)
     else:                                          # high card
         return (0, ranks)
+
+
+mydeck = [r + s for r in '23456789TJQKA' for s in 'SHDC']
+
+
+def deal(numhands, n=5, deck=mydeck):
+    random.seed()
+    random.shuffle(deck)
+    result = []
+    for i in range(numhands):
+        result.append(deck[i * n: (i + 1) * n])
+
+    return result
 
 
 def test():
@@ -101,17 +117,28 @@ def test():
     assert flush(sf) == True
     assert flush(fk) == False
 
-    assert poker([sf, fk, fh]) == sf
-    assert poker([fk, fh]) == fk
-    assert poker([fh, fh]) == fh
-    assert poker([sf]) == sf
-    assert poker([sf] + 99*[fh]) == sf
+    assert poker([sf, fk, fh]) == [sf]
+    assert poker([fk, fh]) == [fk]
+    assert poker([fh, fh]) == [fh, fh]
+    assert poker([sf]) == [sf]
+    assert poker([sf] + 99*[fh]) == [sf]
     assert hand_rank(sf) == (8, 10)
     assert hand_rank(fk) == (7, 9, 7)
     assert hand_rank(fh) == (6, 10, 7)
+
+    # hands with ties
+    hands_with_ties = [['6C', '7C', '8C', '9C', 'TC'], ['6D', '7D', '8D', '9D', 'TD'],
+                       ['9D', '9H', '9S', '9C', '7D'], ['TD', 'TC', 'TH', '7C', '7D']]
+    assert poker(hands_with_ties) == [['6C', '7C', '8C', '9C', 'TC'], ['6D', '7D', '8D', '9D', 'TD']]
     return 'tests pass'
 
 
 
 if __name__ == "__main__":
     print(test())
+    print(deal(2))
+    # print(allmax([['6C', '7C', '8C', '9C', 'TC'], ['6D', '7D', '8D', '9D', 'TD']], key=hand_rank))
+    # print(max([['6C', '7C', '8C', '9C', 'TC'], ['6D', '7D', '8D', '9D', 'TD']], key=hand_rank))
+    # print(hand_rank(['6C', '7C', '8C', '9C', 'TC']))
+    # print(hand_rank(['6D', '7D', '8D', '9D', 'TD']))
+    # print(hand_rank(['6C', '7C', '8C', '9C', 'TC']) == hand_rank(['6D', '7D', '8D', '9D', 'TD']))
