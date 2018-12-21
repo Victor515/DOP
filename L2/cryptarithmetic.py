@@ -84,4 +84,4 @@ def faster_solve(formula):
 if __name__ == '__main__':
     print(compile_word("ABC"))
     print(compile_word_reference("ABC"))
-    print(faster_solve("ODD+ODD==EVEN"))
+    print(compile_formula("ODD+ODD==EVEN"))
